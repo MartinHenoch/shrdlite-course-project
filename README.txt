@@ -32,4 +32,5 @@ Extensions:
 --------------------------------------------------------------------------------
 Extra:
  Quantifiers - This extension was not fully completed but is included in the
- file ...
+ file 'AlternativeInterpreterWithAllQuantifiers'. There are some unsolved bugs
+ left in this implementation. But the general idea of the code should be sound.
