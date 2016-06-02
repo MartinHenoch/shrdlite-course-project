@@ -258,7 +258,7 @@ module Interpreter {
   * @param state The current world state
   * @returns A list of the string keys correspoding to objects in the world matching given object description
   */
-  function findObject(obj : Parser.Object , state : WorldState) : string[] {
+  export function findObject(obj : Parser.Object , state : WorldState) : string[] {
     //stores string keys to all found objects matching what we are looking for. Returned by the function
     var foundObjects : string[] = [];
     // string keys to all world objects
