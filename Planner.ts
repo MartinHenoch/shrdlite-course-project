@@ -194,8 +194,8 @@ module Planner {
 
         var relation : string = literal.relation
 
-        //Calculations for inside, ontop, and under, which can be approximated without violating admissability
-        if (relation === "inside" || relation === "ontop" || relation === "under"){
+        //Calculations for inside and ontop
+        if (relation === "inside" || relation === "ontop" ){
           if(testState.holding === objectA || testState.holding === objectB){
             return Math.abs(xA-xB) + 3*Math.max(objectsAboveA,objectsAboveB)
           }else{
@@ -209,7 +209,7 @@ module Planner {
           return distance
         }
         else if (relation === "leftof"){
-          var moveA : number = 3*objectsAboveA + Math.abs(xB-xA-1)
+          var moveA : number = 3*objectsAboveA +  Math.abs(xB-xA-1)
           var moveB : number = 3*objectsAboveB + Math.abs(xB-xA+1)
           distance += +Math.min(moveA,moveB) + Math.min(armDistanceA,armDistanceB)
           return distance
@@ -218,8 +218,8 @@ module Planner {
           var moveB : number = 3*objectsAboveB + Math.abs(xB-xA-1)
           distance += +Math.min(moveA,moveB) + Math.min(armDistanceA,armDistanceB)
           return distance
-        } else if (relation === "above"){
-          distance += 3*objectsAboveA + Math.abs(xA-xB) + armDistanceA
+        } else if (relation === "above" || relation === "under"){
+          distance += 3*objectsAboveA + 10*Math.abs(xA-xB) + armDistanceA
           return distance
         }
       return distance
