@@ -15,7 +15,7 @@ Extensions:
   moved ("take" command needs all objects above the target removed, for example) and
   we can therefore attach a higher weight to these. Heuristic should be able to handle 
   nearly all of the harder commands. Notably hard commands include "stack all red objects"
-  in the complex world, and in the medium world (full disclosure: might time out on
+  in the complex world, and in the medium world (full disclosure: this one might time out on
   slower computers, approaches the 10sec limit). Unable to handle "stack all yellow objects"
   in the complex world,  altough we're not sure that one is actually possible?
 
