@@ -142,7 +142,7 @@ module Planner {
         armDistanceA =0;
         objectsAboveA = 0;
       } else {
-        coordsA = getCoords(objectA, testState)
+        coordsA = Interpreter.getCoords(objectA, testState)
         xA = coordsA[0]
         armDistanceA = Math.abs(xA-state.arm)
         yA = coordsA[1]
@@ -177,7 +177,7 @@ module Planner {
         armDistanceB=0;
         objectsAboveB = 0;
       } else {
-        coordsB = getCoords(objectB, testState)
+        coordsB = Interpreter.getCoords(objectB, testState)
         xB = coordsB[0]
         armDistanceB = Math.abs(xB-state.arm)
         yB = coordsB[1];
@@ -224,24 +224,6 @@ module Planner {
         }
       return distance
     }
-
-    function getCoords(strKey : string, state : WorldState) : number[]{
-      var x : number;
-      var y : number;
-      if(strKey.substring(0,6) === "floor-"){
-        x = Number(strKey.substr(7));
-        y = -1;
-      }else{
-        state.stacks.forEach((stack,index) => {
-          if(stack.indexOf(strKey) !=-1){
-            x = index;
-            y = stack.indexOf(strKey)
-          }
-        })
-      }
-      return [x,y]
-    }
-
     // max allocated time for a search in seconds
     var timeout : number = 10;
     var result : SearchResult<WorldState> = aStarSearch<WorldState>(graph,start,goal,heuristic,timeout);

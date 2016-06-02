@@ -215,7 +215,7 @@ function Questions(world : World,interpretations : Interpreter.InterpretationRes
           if(arg[1].substring(6,7) === "0")
           {
             // it creates the string output for the question:
-            thisInterp = thisInterp + objectInterpretation(arg[0]) + rel + " the floor ";
+            thisInterp = thisInterp + objectInterpretation(arg[0],world.currentState)+ " " + rel + " the floor ";
             if ( (nConj>1) && (iConj<nConj-1) )
             {
               thisInterp = thisInterp + " and ";
@@ -264,9 +264,9 @@ function Questions(world : World,interpretations : Interpreter.InterpretationRes
           // it creates the string output for the question:
           if(nArgs > 1)
           {
-            thisInterp = thisInterp + objectInterpretation(arg[0])+ rel + " "+objectInterpretation(arg[1]);
+            thisInterp = thisInterp + objectInterpretation(arg[0],world.currentState)+ " "+ rel + " "+objectInterpretation(arg[1],world.currentState);
           }else{
-            thisInterp = thisInterp + rel + " " + objectInterpretation(arg[0]);
+            thisInterp = thisInterp + rel + " " + objectInterpretation(arg[0],world.currentState);
           }
           if ( (nConj>1) && (iConj<nConj-1) )
           {
@@ -345,60 +345,13 @@ function Questions(world : World,interpretations : Interpreter.InterpretationRes
   }
 
 }
-
-
-
-
-
-function objectInterpretation(objectIN : string) :string
+/**
+Returns a string with the objects properties
+*/
+function objectInterpretation(objKey : string, state : WorldState) :string
 {
-  var objectOUT : string;
-
-  switch (objectIN)
-    {
-    case'e':
-      objectOUT = "large white ball ";
-      break;
-    case'a':
-      objectOUT = "large green brick ";
-      break;
-    case'l':
-      objectOUT = "large red box ";
-      break;
-    case'i':
-      objectOUT = "large yellow pyramid ";
-      break;
-    case'h':
-      objectOUT = "small red table ";
-      break;
-    case'j':
-      objectOUT = "small red pyramid ";
-      break;
-    case'k':
-      objectOUT = "large yellow box ";
-      break;
-    case'g':
-      objectOUT = "large blue table ";
-      break;
-    case'c':
-      objectOUT = "large red plank ";
-      break;
-    case'b':
-      objectOUT = "small white brick ";
-      break;
-    case'd':
-      objectOUT = "small green plank ";
-      break;
-    case'm':
-      objectOUT = "small blue box ";
-      break;
-    case'f':
-      objectOUT = "small black ball ";
-      break;
-    default:
-
-    }
-
-  return objectOUT;
-
+  if(objKey.substring(0,6)==="floor-"){
+    return "floor"
+  }
+  return state.objects[objKey].size + " " + state.objects[objKey].color + " " + state.objects[objKey].form
 }
