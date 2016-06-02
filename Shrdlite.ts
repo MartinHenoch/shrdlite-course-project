@@ -72,39 +72,24 @@ module Shrdlite {
                 world.printDebugInfo("  (" + n + ") " + Interpreter.stringify(result));
             });
 
-            try{
-              // ambiguity questions if the quantifier of the parser is "the", or "a" with different parse intrepretations,
-              var quantifier1 : string = parses[0].parse.entity.quantifier
-              if( (parses[0].parse.command != "pick up") && (parses[0].parse.command != "grasp") && (parses[0].parse.command != "take")  )
-              {
-                var quantifier2 : string = parses[0].parse.location.entity.quantifier;
-                if ((quantifier1 == "the") || (quantifier2 == "the")  || (interpretations.length > 1))
-                {
-                  if ((interpretations.length > 1) || ( interpretations[0].interpretation.length > 1) )
-                  {
-                    interpretations = Questions(world,interpretations);
-                  }
-                }
-              }else{
-                if ((quantifier1 == "the")  || (interpretations.length > 1))
-                {
-                  if ((interpretations.length > 1) || ( interpretations[0].interpretation.length > 1) )
-                  {
-                    interpretations = Questions(world,interpretations);
-                  }
-                }
-              }
-            }
-            catch(err) {
-              world.printError("Questions error", err);
-              return;
-            }
+            if (interpretations.length > 1) {
+                // several interpretations were found -- how should this be handled?
+                // should we throw an ambiguity error?
+                // ... throw new Error("Ambiguous utterance");
+                // or should we let the planner decide?
 
+
+
+            }
         }
         catch(err) {
             world.printError("Interpretation error", err);
             return;
         }
+
+        world.printSystemOutput("hej, nu är interpretation färdigt.");
+        world.printSystemOutput(interpretations.length.toString())
+        world.printSystemOutput(JSON.stringify(interpretations[0].interpretation));
 
         // Planning
         try {
@@ -114,7 +99,25 @@ module Shrdlite {
                 world.printDebugInfo("  (" + n + ") " + Planner.stringify(result));
             });
 
+            //If more than one possible parse with feasable interpretations, let user select which interpretation to use.
             if (plans.length > 1) {
+
+              var promptStr : string = '';
+              var parse : Parser.Command;
+              for (var i = 0; i < interpretations.length; i++) {
+                var parseStr = i + ': ' + parseToString(interpretations[i].parse) + '\n';
+                promptStr = promptStr + parseStr;
+              }
+
+              var messageStr : string = "Which command do you wish to execute? Type the number of the command you want to select:";
+
+              promptStr = promptStr + messageStr;
+
+              var userInput : string = prompt(promptStr);
+              var indexSelectedParse : number = parseInt(userInput);
+
+              interpretations = [ interpretations[indexSelectedParse] ];
+
                 // several plans were found -- how should this be handled?
                 // this means that we have several interpretations,
                 // should we throw an ambiguity error?
@@ -150,182 +153,8 @@ module Shrdlite {
         return plan;
     }
 
-}
-
-// avoid several floor, avoid a/the, already true? ...
-function Questions(world : World,interpretations : Interpreter.InterpretationResult[]) : Interpreter.InterpretationResult[]
-{
-
-  world.printSystemOutput("There are several interpretations: ")
-
-  var iInterpCount : number = 0;
-  var interpCount = new Array();
-  interpCount[0] = new Array();  // count iParse
-  interpCount[1]= new Array(); // count iInterp
-
-  var nParses : number = interpretations.length;
-  for (var iParse= 0; iParse<nParses; iParse++)
-  {
-
-
-    var floorAppear : boolean = false;
-    var floorCount : number[]=[];
-    var isFloor : boolean[] = [];
-    var nInterpretations : number = interpretations[iParse].interpretation.length;
-    for (var iInterp= 0; iInterp<nInterpretations ; iInterp++)
-    {
-
-
-      var nConj : number = interpretations[iParse].interpretation[iInterp].length;
-      for (var iConj= 0; iConj< nConj; iConj++)
-      {
-
-        var thisInterp : string ="";
-        var rel : string = interpretations[iParse].interpretation[iInterp][iConj].relation;
-        var nArgs : number = interpretations[iParse].interpretation[iInterp][iConj].args.length
-        var arg : string[];
-        arg = interpretations[iParse].interpretation[iInterp][iConj].args;
-
-        if(nArgs > 1)
-        {
-          if(arg[1].substring(0,6) === "floor-") // we dont want to count all the floors for the interpretation
-          {
-            floorAppear = true;
-            floorCount[iInterpCount] = 0;
-          }else{
-            floorAppear = false;
-          }
-        }else{
-          floorAppear = false;
-        }
-
-        // just show one time per floor, and count how many floors...
-        if(floorAppear)
-        {
-          if(arg[1].substring(6,7) === "0")
-          {
-            // it creates the string output for the question:
-            thisInterp = thisInterp + objectInterpretation(arg[0]) + rel + " the floor ";
-            if ( (nConj>1) && (iConj<nConj-1) )
-            {
-              thisInterp = thisInterp + " and ";
-            }
-            //print and count:
-            world.printSystemOutput(iInterpCount +".- " + thisInterp);
-            interpCount[0][iInterpCount]=iParse;
-            interpCount[1][iInterpCount]=iInterp;
-            isFloor[iInterpCount] = true;
-            floorCount[iInterpCount] = 1;
-            iInterpCount++;
-
-          }else{
-            floorCount[iInterpCount-1]++;
-          }
-
-        }else{
-          // it creates the string output for the question:
-          if(nArgs > 1)
-          {
-            thisInterp = thisInterp + objectInterpretation(arg[0])+ rel + " "+objectInterpretation(arg[1]);
-          }else{
-            thisInterp = thisInterp + rel + " " + objectInterpretation(arg[0]);
-          }
-          if ( (nConj>1) && (iConj<nConj-1) )
-          {
-            thisInterp = thisInterp + " and ";
-          }
-          //print and count:
-          world.printSystemOutput(iInterpCount +".- " + thisInterp);
-          interpCount[0][iInterpCount]=iParse;
-          interpCount[1][iInterpCount]=iInterp;
-          isFloor[iInterpCount] = false;
-          iInterpCount++;
-        }
-
-      }
-
+    function parseToString(parse : Parser.Command) : string {
+      return "return value from parseToString...";
     }
-
-  }
-
-  var userReading = prompt("What interpretation do you mean? (Answer with a number)","0");
-  var iUserInterp : number = +userReading;
-  world.printSystemOutput("User interpretation: " + iUserInterp);
-
-  var result : Interpreter.InterpretationResult[] = [];
-  result[0] = interpretations[interpCount[0][iUserInterp]]; //takes all the interpretations to the planner
-  if (isFloor[iUserInterp])
-  {
-    for(var iFloor=0;iFloor<floorCount[iUserInterp];iFloor++) // it returns all the floors asociated with the user interpretation
-    {
-      result[0].interpretation[iFloor]= interpretations[interpCount[0][iUserInterp]].interpretation[interpCount[1][iUserInterp]+iFloor];
-    }
-    result.splice(1,result.length-1);
-    result[0].interpretation.splice(floorCount[iUserInterp],result[0].interpretation.length-floorCount[iUserInterp]);
-
-  }else{
-
-  result[0].interpretation[0] = interpretations[interpCount[0][iUserInterp]].interpretation[interpCount[1][iUserInterp]];
-  result.splice(1,result.length-1);
-  result[0].interpretation.splice(1,result[0].interpretation.length-1);
-  }
-  //world.printSystemOutput("result: "+result[0].interpretation[0][0].relation+ " "+result[0].interpretation[0][0].args)
-
-  return result;
-}
-
-
-
-
-function objectInterpretation(objectIN : string) :string
-{
-  var objectOUT : string;
-
-  switch (objectIN)
-    {
-    case'e':
-      objectOUT = "large white ball ";
-      break;
-    case'a':
-      objectOUT = "large green brick ";
-      break;
-    case'l':
-      objectOUT = "large red box ";
-      break;
-    case'i':
-      objectOUT = "large yellow pyramid ";
-      break;
-    case'h':
-      objectOUT = "small red table ";
-      break;
-    case'j':
-      objectOUT = "small red pyramid ";
-      break;
-    case'k':
-      objectOUT = "large yellow box ";
-      break;
-    case'g':
-      objectOUT = "large blue table ";
-      break;
-    case'c':
-      objectOUT = "large red plank ";
-      break;
-    case'b':
-      objectOUT = "small white brick ";
-      break;
-    case'd':
-      objectOUT = "small green plank ";
-      break;
-    case'm':
-      objectOUT = "small blue box ";
-      break;
-    case'f':
-      objectOUT = "small black ball ";
-      break;
-    default:
-
-    }
-
-  return objectOUT;
 
 }

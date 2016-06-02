@@ -36,7 +36,6 @@ module Interpreter {
   * @returns Augments ParseResult with a list of interpretations. Each interpretation is represented by a list of Literals.
   */
 
-  //TODO: remove world from parameters if it doesn't work:
   export function interpret(parses : Parser.ParseResult[], currentState : WorldState, world : World) : InterpretationResult[] {
     var errors : Error[] = [];
     var interpretations : InterpretationResult[] = [];
@@ -86,7 +85,6 @@ module Interpreter {
   export function stringify(result : InterpretationResult) : string {
     return result.interpretation.map((literals) => {
       return literals.map((lit) => stringifyLiteral(lit)).join(" & ");
-      // return literals.map(stringifyLiteral).join(" & ");
     }).join(" | ");
   }
 
@@ -110,40 +108,9 @@ module Interpreter {
   * @returns A list of list of Literal, representing a formula in disjunctive normal form (disjunction of conjunctions). See the dummy interpetation returned in the code for an example, which means ontop(a,floor) AND holding(b).
   */
 
-  //TODO: Remove world from parameters if things doesn't work out.
   function interpretCommand(cmd : Parser.Command, state : WorldState, world : World) : DNFFormula {
 
-
-
-    console.log("world");
-    console.log(world);
-    world.printSystemOutput("Nu är vi inne i interpretCommand");
-    // world.readUserInput("säg nåt då");
-
-    try {console.log("Nu är vi i interpretCommand");
-      var userInput : string = prompt('Skriv någon input');
-      // console.log("userInput: " + userInput);
-      world.printSystemOutput("userInput:" + userInput);
-    } catch(e) {
-      console.log(e)
-    }
-
-    var keysPossibleObjects : string[] = ['a', 'b', 'c'];
-    var selectedKey : string = letUserSelectObject(keysPossibleObjects, state, world);
-
-    world.printSystemOutput("selectedKey:" + selectedKey);
-
-//    function letUserSelectObject(keysPossibleObjects : string[], state : WorldState, world: World) : string {
-
-
-    // console.log(cmd);
-    // console.log(state.stacks);
-    // console.log(state.objects);
-
     var interpretation : DNFFormula = [];
-    // a count of the number of interpretations we've added
-    //TODO: change back interpCount
-    // var interpCount : number = 0;
     //if it is a [take entity] command:
     if(cmd.command === "take"){
       //find all entities matching the given discription
@@ -151,13 +118,10 @@ module Interpreter {
       //add them to the interpetation list (with the exception of floor which cannot be grasped)
       possibleEntities.forEach((possibleEnt) => {
         if(possibleEnt.substring(0,6) !=="floor-"){
-          //TODO: change back to interpCount
           var conjunction : Conjunction = [];
           var literal : Literal = {polarity : true, relation: "holding", args: [possibleEnt] };
           conjunction.push(literal);
           interpretation.push(conjunction);
-          // interpretation[interpCount] = [ {polarity : true, relation : "holding", args: [possibleEnt] }]
-          // interpCount++
         }
       })
     } else {
@@ -185,10 +149,7 @@ module Interpreter {
             }
           }
           if(!flag && stackOrder.length>0){
-            //TODO change back to interpCount
             interpretation.push(stackOrder);
-            // interpretation[interpCount] = stackOrder
-            // interpCount++
           }
         })
       }
@@ -214,9 +175,6 @@ module Interpreter {
               var literal : Literal = {polarity : true, relation : cmd.location.relation, args: [state.holding,possibleEnt]};
               conjunction.push(literal);
               interpretation.push(conjunction);
-              // TODO: change back to interpCount (or remove commented code...)
-              // interpretation[interpCount] = [{polarity : true, relation : cmd.location.relation, args: [state.holding,possibleEnt]}]
-              // interpCount++;
             }
           })
         }
@@ -276,7 +234,6 @@ module Interpreter {
 
           // Convert format from 'string[][][]' to 'Literal'
           for (var i = 0; i < feasableSolutions.length; i++) {
-            //console.log("inne i loop feasable");
             var solution : Solution = feasableSolutions[i];
             var conjunction : Conjunction = [];
             for (var j = 0; j < solution.length; j++) {
@@ -289,54 +246,15 @@ module Interpreter {
             }
             interpretation.push(conjunction);
           }
-          //console.log("interpretation");
-          //visDNF(interpretation);
         }
-
-
-        // //find all entities matching description to be moved: put THIS_ENTITY in relation to something
-        // var possibleEntities : string[] = findEntity(cmd.entity,state);
-        //
-        // //console.log("possibleEntities");
-        // //console.log(possibleEntities);
-        //
-        // possibleEntities.forEach((possibleEnt,index1) => {
-        //   //cannnot move the floor
-        //   if(possibleEnt.substring(0,6) !== "floor-" ){
-        //     //find all entities matching the description of which the location is in relation to: put something in relation to THIS_ENTITY
-        //
-        //     var possibleLocationEntities : string[] = findEntity(cmd.location.entity,state);
-        //     possibleLocationEntities.forEach((possibleLocationEnt) => {
-        //       //check physic laws
-        //       var objectA : ObjectDefinition = state.objects[possibleEnt]
-        //       var objectB : ObjectDefinition;
-        //       if(possibleLocationEnt.substring(0,6) === "floor-"){
-        //         objectB = {size: null, color: null, form : "floor"}
-        //       }
-        //       else{
-        //         objectB = state.objects[possibleLocationEnt]
-        //       }
-        //       if(checkPhysicLaws(objectA,objectB,cmd.location.relation)){
-        //         interpretation[interpCount] = [{polarity : true, relation : cmd.location.relation, args: [possibleEnt,possibleLocationEnt]}]
-        //         interpCount++;
-        //       }
-        //     })
-        //   }
-        //
-        // })
       }
     }
-    //throw error if no valid interpretation was found
-    //TODO: Ska vi använda oss av interpCount??
-    // if(interpCount === 0){
-    //   throw "No valid interpretation"
-    // }
+    // 
     // if (interpretation.length === 0) {
     //   throw "No valid interpretation";
     // }
 
-
-    // // convert interpretation to single floor slot to work with test cases:
+    // // convert interpretation to single floor slot to work with test cases, uncomment these lines to use!
     // var convertedInterpretation : DNFFormula = convertInterpretationToSingleFloorSlot(interpretation);
     // return convertedInterpretation;
 
@@ -373,6 +291,7 @@ module Interpreter {
     return simplifiedDNF;
   }
 
+  // Ask user for input to choose one of many objects.
   function letUserSelectObject(keysPossibleObjects : string[], state : WorldState, world: World) : string {
 
     var promptStr : string = '';
@@ -389,9 +308,7 @@ module Interpreter {
     var selectedKey : string = prompt(promptStr)
 
     return selectedKey;
-
   }
-
 
   // Remove duplicate conjunctions, and remove duplicate literals in every conjunction,
   function simplifyDNFFormula(dnf : DNFFormula) : DNFFormula {
@@ -430,13 +347,12 @@ module Interpreter {
     return simplifiedDNF;
   }
 
-
   // Declare types for describing solutions. An action is the two strKeys of the
   // objects involved in an action, and the relation between them. Eg. ['a', 'floor-1', ontop]
   type Action = string[];
   type Solution = Action[];
 
-
+  // Visualize DNFFormula:
   function visDNF(interpretation : DNFFormula) : void {
 
     var DNF :string[][] = [];
@@ -454,8 +370,6 @@ module Interpreter {
     console.log(DNF);
 
   }
-
-
 
   function generateSolutions(aList: string[], bList: string[], size: number, relation: string) : Solution[] {
 
@@ -501,6 +415,7 @@ module Interpreter {
   }
 
 
+  // Identify which solutions are feasable. From the given array of possible solutions.
   function findFeasableSolutions(possibleSolutionsList : Solution[], state : WorldState) : Solution[] {
 
     var feasableSolutions : Solution[] = [];
@@ -533,10 +448,7 @@ module Interpreter {
         }
 
         if (objectA === undefined || objectB === undefined) {
-          //console.log("objectA: " + objectA + "\nobjectB: " + objectB);
-          //console.log("strKeyA: " + strKeyA + "\nstrKeyB: " + strKeyB);
-          //console.log(state.stacks);
-          //console.log(state.objects);
+          throw new Error("One or more objects are undefined.")
         }
 
         var isFeasableAction: boolean = checkPhysicLaws(objectA, objectB, relation);
@@ -610,7 +522,6 @@ module Interpreter {
   * @returns A list of the string keys correspoding to objects in the world matching given entity description
   */
   function findEntity(ent : Parser.Entity , state : WorldState, world : World) : string[] {
-    // Qunatifier assumed to be "the/any". Support for "all" extended later
 
     var identifiedObjects : string[] = findObject(ent.object, state, world);
 
@@ -632,8 +543,6 @@ module Interpreter {
           // If more than one object was found:
           else {
             var selectedKey : string = letUserSelectObject(identifiedObjects, state, world);
-            // console.log("More than one possible object was found, when quantifier 'the' was used.")
-            // throw new Error("More than one possible object was found, when quantifier 'the' was used.");
             identifiedObjects = [selectedKey];
             return identifiedObjects;
           }
@@ -644,6 +553,7 @@ module Interpreter {
         throw new Error("Invalid quantifier: " + ent.quantifier);
     }
   }
+
   /**
   * Finds the possible object-key-strings corresponding to an arbitrary object
   * @param obj The object being searched for
@@ -694,12 +604,11 @@ module Interpreter {
     }
     return foundObjects
   }
+
   /** Checks if CoordinatesA fullfills LOCATION requirements in relation to
   * some entity B (the location.entity, which could correspond to multiple objects).
   * @returns true if requirements are fullfilled
   */
-
-
   function checkLocation(coordinatesA : number[], location : Parser.Location, state : WorldState, world : World) : boolean {
 
     var bList : string[] = findEntity(location.entity, state, world);
@@ -785,72 +694,6 @@ module Interpreter {
       }
     }
   }
-
-
-  //
-  // function checkLocation(coordinatesA : number[],location : Parser.Location, state : WorldState) : boolean{
-  //   var bList : string[] = findEntity( location.entity , state )
-  //   //if the location.relation is fullfilled with respect to ANY other object
-  //   //matching the entity description: return true
-  //   for(var j = 0 ; j < bList.length ; j++){
-  //     // special case: in relation to floor
-  //     if(bList[j].substring(0,6)==="floor-"){
-  //       if(location.relation === "above"  && coordinatesA[0] === Number(bList[j].substring(6,7))){
-  //         return true
-  //       }
-  //       if(location.relation === "ontop" && coordinatesA[0] === Number(bList[j].substring(6,7))){
-  //         if(coordinatesA[1] === 0){
-  //           return true
-  //         }
-  //       }
-  //       continue
-  //     }
-  //     var coordinatesB : number[] = getCoords(bList[j],state)
-  //     if(location.relation === "leftof"){
-  //       if(coordinatesA[0]<coordinatesB[0]){
-  //         return true
-  //       }
-  //     }
-  //     else {if(location.relation === "rightof"){
-  //       if(coordinatesA[0]>coordinatesB[0]){
-  //         return true
-  //       }
-  //     }
-  //     else {if(location.relation === "ontop"){
-  //       if(state.objects[bList[j]].form !== "box"){
-  //         if(coordinatesA[0]===coordinatesB[0] && coordinatesA[1] === coordinatesB[1]+1){
-  //
-  //           return true
-  //         }
-  //       }
-  //     }
-  //     else {if(location.relation === "inside"){
-  //       if(state.objects[bList[j]].form === "box"){
-  //         if(coordinatesA[0]===coordinatesB[0] && coordinatesA[1] === coordinatesB[1]+1){
-  //           return true
-  //         }
-  //       }
-  //     }
-  //     else {if(location.relation === "under"){
-  //       if(coordinatesA[0]===coordinatesB[0] && coordinatesA[1]<coordinatesB[1]){
-  //         return true
-  //       }
-  //     }
-  //     else {if(location.relation === "beside"){
-  //       if(Math.abs(coordinatesA[0]-coordinatesB[0])===1){
-  //         return true
-  //       }
-  //     }
-  //     else {if(location.relation === "above"){
-  //       if(coordinatesA[0]===coordinatesB[0] && coordinatesA[1]>coordinatesB[1]){
-  //         return true
-  //       }
-  //     }}}}}}}
-  //   }
-  //   return false
-  // }
-
-
 
   /** Finds coordinates of an object given a key. Assending coordinate system to the right and upwards
   * @param strKey string key of object being searched for
