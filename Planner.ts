@@ -199,7 +199,7 @@ module Planner {
           if(testState.holding === objectA || testState.holding === objectB){
             return Math.abs(xA-xB) + 3*Math.max(objectsAboveA,objectsAboveB)
           }else{
-          distance+=5*objectsAboveB + 5*objectsAboveA + Math.min(armDistanceA,armDistanceB) + 10*Math.abs(xA-xB) +1
+          distance+=3*objectsAboveB + 5*objectsAboveA + Math.min(armDistanceA,armDistanceB) + 10*Math.abs(xA-xB) +1
           return distance
         }
         } else if (relation === "beside"){
