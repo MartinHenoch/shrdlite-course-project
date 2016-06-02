@@ -9,7 +9,15 @@ Implementation of the aStarSearch, Interpreter, Planner, and some extensions.
 Extensions:
 1) Heuristic - Non-admissible heuristic that takes stack sizes, weights etc. into
   account. Note that it might not find the optimal path due to being non-admissible,
-  but it should find one close enough.
+  but it should find one close enough. Reason for choosing non-admissable is that the
+  program simply times out on more complex commands otherwise. Non-admissability
+  works quite well in shrdlite since we can easily determine what objects NEEDS to be
+  moved ("take" command needs all objects above the target removed, for example) and
+  we can therefore attach a higher weight to these. Heuristic should be able to handle 
+  nearly all of the harder commands. Notably hard commands include "stack all red objects"
+  in the complex world, and in the medium world (full disclosure: might time out on
+  slower computers, approaches the 10sec limit). Unable to handle "stack all yellow objects"
+  in the complex world,  altough we're not sure that one is actually possible?
 
 2) Weights - Large objects have extra weight when being moved (double the cost for
   the arm to move/drop/pick up a large object). Also considered in the heuristic.
