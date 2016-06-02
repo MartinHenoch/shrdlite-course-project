@@ -4,11 +4,11 @@
 /**
 Takes a parse of the question type, i.e. parse.command === "Q: _____ "
 Implemented questions:
-  Where is __(entity)__ ? || Where are __(entity)__?
-  How many __(plural object)__ are there?
-  ....
-  @param parse The question to answer
-  @returns a string which gets printed to the User
+Where is __(entity)__ ? || Where are __(entity)__?
+How many __(plural object)__ are there?
+....
+@param parse The question to answer
+@returns a string which gets printed to the User
 */
 function interpretQuestion( parse : Parser.Command, state : WorldState) : string{
   if(parse.command === "Q_where_is") {
@@ -39,7 +39,7 @@ function interpretQuestion( parse : Parser.Command, state : WorldState) : string
       if (object.size !== null) {
         objectDescriptionStr += object.size + " ";
       }
-      if (object.color !== null) {
+      if (object.size !== null) {
         objectDescriptionStr += object.color + " ";
       }
       objectDescriptionStr += object.form;
@@ -55,14 +55,51 @@ function interpretQuestion( parse : Parser.Command, state : WorldState) : string
     var foundObjects : string[] = Interpreter.findObject(searchObject, state);
     var numberOfObjects : number = foundObjects.length;
     var numString : string = numberOfObjects.toString();
-    return "There are " + numString + generateObjectDescription(searchObject) + ".";
+    var multiplierString : string;
+    if (numberOfObjects > 1) {
+      multiplierString = 's';
+    } else {
+      multiplierString = '';
+    }
+    return "There are " + numString + " " + generateObjectDescription(searchObject) + multiplierString + ".";
   }
   // If the command is of the wrong format somehow..
   return "BAD RETURN STRING from 'interpretQuestion'"
 }
 
-function generateObjectDescription(object : Parser.Object) {
-  return JSON.stringify(object);
-//  return "<object description>";
+function generateObjectDescription(object : Parser.Object) : string {
+  //  return JSON.stringify(object);
+  //  return "<object description>";
+  var str : string = '';
+  if ('form' in object) {
+    if (object.size !== null) {
+      str += object.size + " ";
+    }
+    if (object.color !== null) {
+      str += object.color + " ";
+    }
+    if (object.form !== "anyform") {
+      str += object.form;
+    } else {
+      str += "a";
+    }
+    return str;
+  }
+  // otherwise, object is of form {object: Object, location: Location}
+  else {
+    var objectDescriptionString : string = generateObjectDescription(object.object);
+    var locationDesctiptionString : string = generateLocationDescription(object.location);
+    str += objectDescriptionString + " " + locationDesctiptionString;
+    return str;
+  }
+}
 
+function generateLocationDescription(location : Parser.Location) : string {
+  var str : string = location.relation + " " + generateEntityDescription(location.entity);
+  return str;
+}
+
+function generateEntityDescription(entity : Parser.Entity) : string {
+  var str : string = entity.quantifier + " " + generateObjectDescription(entity.object);
+  return str;
 }
