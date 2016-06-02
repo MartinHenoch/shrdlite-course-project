@@ -118,7 +118,7 @@ module Planner {
       return Math.min(...hMaxOfRows)
     }
 
-    /** Gets an admissible heuristic for a signle literal depending on how
+    /** Gets heuristic for a signle literal depending on how
     close it is to being fullfilled in a world state
     */
     function distanceCalc(testState : WorldState, literal : Interpreter.Literal) : number{
@@ -245,6 +245,9 @@ module Planner {
     // max allocated time for a search in seconds
     var timeout : number = 10;
     var result : SearchResult<WorldState> = aStarSearch<WorldState>(graph,start,goal,heuristic,timeout);
+    if(result == null){
+      throw "Search timed out. To hard :("
+    }
     //Result.path is the resulting series of worldStates we want to traverse to reach the goal.
     //We find the commands (l,r,p,d) by checking how these world states change in order from start to finish
     var previousState : WorldState;
