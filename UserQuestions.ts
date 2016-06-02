@@ -47,21 +47,68 @@ function interpretQuestion( parse : Parser.Command, state : WorldState) : string
     }
     messageStr += "ontop of the floor";
     return messageStr;
-  }
-  if(parse.command === "Q_how_many") {
+  } else if (parse.command === "Q_how_many") {
     // ATTENTION! parse.entity is called "entity" but it IS an object!
     var searchObject : Parser.Object = parse.entity;
 
     var foundObjects : string[] = Interpreter.findObject(searchObject, state);
     var numberOfObjects : number = foundObjects.length;
-    var numString : string = numberOfObjects.toString();
+    var numString : string;
+
+    switch(numberOfObjects) {
+      case 1:
+      numString = 'one';
+      break;
+      case 2:
+      numString = 'two';
+      break;
+      case 3:
+      numString = 'three';
+      break;
+      case 4:
+      numString = 'four';
+      break;
+      case 5:
+      numString = 'five';
+      break;
+      case 6:
+      numString = 'six';
+      break;
+      case 7:
+      numString = 'seven';
+      break;
+      case 8:
+      numString = 'eight';
+      break;
+      case 9:
+      numString = 'nine';
+      break;
+      default:
+      numString = numberOfObjects.toString();
+      break;
+    }
+
     var multiplierString : string;
-    if (numberOfObjects > 1) {
+    var is_are_string : string;
+    var areMany : boolean = (numberOfObjects > 1);
+
+
+    if (areMany) {
       multiplierString = 's';
+      is_are_string = 'are';
+      if (numberOfObjects < 10) {
+        switch (numberOfObjects) {
+          case 1:
+
+        }
+      }
     } else {
       multiplierString = '';
+      is_are_string = 'is';
+      numString = 'one'
     }
-    return "There are " + numString + " " + generateObjectDescription(searchObject) + multiplierString + ".";
+
+    return "There " + is_are_string + " " + numString + " " + generateObjectDescription(searchObject) + multiplierString + ".";
   }
   // If the command is of the wrong format somehow..
   return "BAD RETURN STRING from 'interpretQuestion'"
@@ -81,7 +128,7 @@ function generateObjectDescription(object : Parser.Object) : string {
     if (object.form !== "anyform") {
       str += object.form;
     } else {
-      str += "a";
+      str += "object";
     }
     return str;
   }
