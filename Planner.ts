@@ -152,8 +152,8 @@ module Planner {
         objectsAboveA = stackA.length -yA -1;
         //Adjusts for size of objects
         tempCount=0;
-        for (var i = 0; i< objectsAboveA -2;i++){
-          if (testState.objects[stackA[yA +i]].size == "large"){
+        for (var i = 0; i< objectsAboveA;i++){
+          if (testState.objects[stackA[yA +i+1]].size == "large"){
             tempCount+=1;
           }
         }
@@ -184,8 +184,8 @@ module Planner {
         stackB = testState.stacks[xB]
         objectsAboveB = stackB.length -yB-1;
         tempCount =0;
-        for (var i = 0; i< objectsAboveB-2;i++){
-          if (testState.objects[stackB[yB +i]].size == "large"){
+        for (var i = 0; i< objectsAboveB;i++){
+          if (testState.objects[stackB[yB +i+1]].size == "large"){
             tempCount+=1;
           }
         }
